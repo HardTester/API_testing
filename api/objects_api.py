@@ -2,8 +2,8 @@ OBJECTS = '/objects'
 OBJECTS_ITEM = '/objects/{}'
 
 
-def get_objects(client, ids=None):
-    return client.get(OBJECTS, params=ids)
+def get_objects(client, *ids):
+    return client.get(OBJECTS, params={'id': ids} if ids else None)
 
 
 def post_object(client, obj):
