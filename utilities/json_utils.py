@@ -64,16 +64,15 @@ js1 = {
     "data": {
         "color": "Cloudy Whit",
         "capacity": {
-            "test": 1
+            "test": [1, 2, 3]
         }
     }
 }
 
 js2 = {
     "data": {
-        "color": "Cloudy White",
+        "color": "Cloudy Whit",
         "capacity": {
-            "test": 2
         }
     }
 }
@@ -86,9 +85,9 @@ def comp_json_left_in_right(json1, json2, key=None, path=''):
             # записываю различия
             pass
         for key in json1:
-            if not json2.get(key):
-                # записываю различия
-                pass
+            if json2.get(key) is None:
+                diff_dict[key] = (json1[key], json2.get(key), f"{path}{key}")
+                return diff_dict
             diff_dict.update(comp_json_left_in_right(json1[key], json2[key], key, f"{path}{key}:"))
     elif isinstance(json1, list):
         if not isinstance(json2, list):
