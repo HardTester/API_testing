@@ -2,6 +2,7 @@ from typing import Type
 
 from pydantic import BaseModel
 
+from utilities.files_utils import read_json_file_data, get_test_data_path
 from utilities.json_utils import compare_json_left_in_right
 
 
@@ -151,3 +152,8 @@ def assert_left_in_right_json(response, exp_json, actual_json):
         .add_expected_info(exp_json) \
         .add_response_info() \
         .get_message()
+
+
+def assert_response_body(request, response):
+    assert_left_in_right_json(response, read_json_file_data(f"{get_test_data_path()}/{request.node.name}"),
+                              response.json())

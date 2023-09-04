@@ -39,6 +39,8 @@ def compare_json_left_in_right(json1, json2):
     """
     diff = []
     for key in json1:
+        # if isinstance(key, dict):
+        #     compare_json_left_in_right(key, json2)
         if isinstance(json1[key], dict) and isinstance(json2[key], dict):
             nested_diff = compare_json_left_in_right(json1[key], json2[key])
             if nested_diff:
@@ -56,3 +58,50 @@ def compare_json_left_in_right(json1, json2):
         elif json1[key] != json2[key]:
             diff.append((key, json1[key], json2[key]))
     return diff
+
+
+js1 = {
+    "data": {
+        "color": "Cloudy Whit",
+        "capacity": {
+            "test": 1
+        }
+    }
+}
+
+js2 = {
+    "data": {
+        "color": "Cloudy White",
+        "capacity": {
+            "test": 2
+        }
+    }
+}
+
+
+def comp_json_left_in_right(json1, json2, key=None, path=''):
+    diff_dict = {}
+    if isinstance(json1, dict):
+        if not isinstance(json2, dict):
+            # записываю различия
+            pass
+        for key in json1:
+            if not json2.get(key):
+                # записываю различия
+                pass
+            diff_dict.update(comp_json_left_in_right(json1[key], json2[key], key, f"{path}{key}:"))
+    elif isinstance(json1, list):
+        if not isinstance(json2, list):
+            # записываю различия
+            pass
+    else:
+        if isinstance(json2, dict) or isinstance(json2, list):
+            # записываю различия
+            pass
+        if json1 != json2:
+            diff_dict[key] = (json1, json2, path[:-1])
+    return diff_dict
+
+
+res = comp_json_left_in_right(js1, js2)
+pass
