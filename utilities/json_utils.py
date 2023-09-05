@@ -64,7 +64,9 @@ js1 = {
     "data": {
         "color": "Cloudy Whit",
         "capacity": {
-            "test": [1, 2, 3]
+            "test": {
+                "haha": {}
+            }
         }
     }
 }
@@ -72,18 +74,28 @@ js1 = {
 js2 = {
     "data": {
         "color": "Cloudy Whit",
+        "test": {
+        },
         "capacity": {
+            "test": 1
         }
     }
 }
+
+"""
+для dict:
+несовпание по типу -> значения левого и правого ключей
+отсутствие ключа в правом json -> значения левого и правого None
+несовпадение значений одинаковых типов -> значения левого и правого ключей
+"""
 
 
 def comp_json_left_in_right(json1, json2, key=None, path=''):
     diff_dict = {}
     if isinstance(json1, dict):
         if not isinstance(json2, dict):
-            # записываю различия
-            pass
+            diff_dict[key] = (json1, json2, path[:-1])
+            return diff_dict
         for key in json1:
             if json2.get(key) is None:
                 diff_dict[key] = (json1[key], json2.get(key), f"{path}{key}")
