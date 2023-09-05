@@ -62,55 +62,45 @@ def compare_json_left_in_right(json1, json2):
 
 js1 = {
     "data": {
+        "kaban": None,
         "color": "Cloudy Whit",
         "capacity": {
-            "test": {
-                "haha": {}
-            }
+            "test": "sdkjf",
+            "test2": "sdkjf"
         }
     }
 }
 
 js2 = {
     "data": {
+        "lala": 1,
         "color": "Cloudy Whit",
-        "test": {
-        },
         "capacity": {
-            "test": 1
+            "test": None
         }
     }
 }
 
 """
+лишние ключи из левого json - игнорируются
+
 для dict:
 несовпание по типу -> значения левого и правого ключей
 отсутствие ключа в правом json -> значения левого и правого None
-несовпадение значений одинаковых типов -> значения левого и правого ключей
+несовпание по значению -> значения левого и правого ключей
 """
 
 
 def comp_json_left_in_right(json1, json2, key=None, path=''):
     diff_dict = {}
-    if isinstance(json1, dict):
-        if not isinstance(json2, dict):
-            diff_dict[key] = (json1, json2, path[:-1])
-            return diff_dict
+    if isinstance(json1, dict) and isinstance(json2, dict):
         for key in json1:
-            if json2.get(key) is None:
-                diff_dict[key] = (json1[key], json2.get(key), f"{path}{key}")
-                return diff_dict
+            if key not in json2:
+                diff_dict[key] = (json1[key], "key undefined", f"{path}{key}")
+                continue
             diff_dict.update(comp_json_left_in_right(json1[key], json2[key], key, f"{path}{key}:"))
-    elif isinstance(json1, list):
-        if not isinstance(json2, list):
-            # записываю различия
-            pass
-    else:
-        if isinstance(json2, dict) or isinstance(json2, list):
-            # записываю различия
-            pass
-        if json1 != json2:
-            diff_dict[key] = (json1, json2, path[:-1])
+    elif json1 != json2:
+        diff_dict[key] = (json1, json2, path[:-1])
     return diff_dict
 
 
