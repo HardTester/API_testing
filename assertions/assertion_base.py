@@ -3,7 +3,7 @@ from typing import Type
 from pydantic import BaseModel
 
 from utilities.files_utils import read_json_file_data, get_test_data_path
-from utilities.json_utils import compare_json_left_in_right
+from utilities.json_utils import compare_json_left_in_right, remove_ids
 
 
 class LogMsg:
@@ -16,9 +16,6 @@ class LogMsg:
         self.response = response
         self.where = where
 
-    def add_user_info(self):
-        self._msg += f"ФАКТИЧЕСКИЕ ЗНАЧЕНИЕ НЕ СОВПАЛО С ОЖИДАЕМЫМ\n" \
-                     f"Имя пользователя:\n\t{self.response.client.get_login()}\n"
         return self
 
     def add_request_url(self):
@@ -114,7 +111,6 @@ def assert_status_code(response, expected):
     :raises AssertionError: если значения не совпали
     """
     assert expected == response.status_code, CodeLogMsg(response) \
-        .add_user_info() \
         .add_request_url() \
         .add_compare_result(expected, response.status_code) \
         .add_response_info() \
@@ -146,7 +142,6 @@ def assert_left_in_right_json(response, exp_json, actual_json):
     """
     compare_res = compare_json_left_in_right(exp_json, actual_json)
     assert not compare_res, BodyLogMsg(response) \
-        .add_user_info() \
         .add_request_url() \
         .add_compare_result(compare_res) \
         .add_expected_info(exp_json) \
@@ -156,4 +151,4 @@ def assert_left_in_right_json(response, exp_json, actual_json):
 
 def assert_response_body(request, response):
     assert_left_in_right_json(response, read_json_file_data(f"{get_test_data_path()}/{request.node.name}"),
-                              response.json())
+                              remove_ids(response.json()))
