@@ -1,23 +1,22 @@
 def remove_ids(origin_dict):
     """
-    Удаляет ключи из словаря, в которых есть id или Id
+    Удаляет ключи из словаря, в которых есть id
     :param origin_dict: исходный словарь
     :return: словарь с выпиленными айдишниками
     """
 
-    def rmv_ids(d):
-        keys_to_remove = []
-
-        for key, value in d.items():
-            if isinstance(value, dict):
+    def rmv_ids(node):
+        remove_keys = []
+        if isinstance(node, dict):
+            for key, value in node.items():
                 rmv_ids(value)
-            elif isinstance(value, list):
-                for val in value:
-                    rmv_ids(val)
-            elif 'id' in key or 'Id' in key:
-                keys_to_remove.append(key)
-        for key in keys_to_remove:
-            del d[key]
+                if key == 'id':
+                    remove_keys.append(key)
+            for key in remove_keys:
+                del node[key]
+        elif isinstance(node, list):
+            for item in node:
+                rmv_ids(item)
 
     res = origin_dict.copy()
     rmv_ids(res)
