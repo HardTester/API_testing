@@ -15,7 +15,6 @@ class LogMsg:
         self._msg = ""
         self.response = response
         self.where = where
-
         return self
 
     def add_request_url(self):
@@ -57,20 +56,8 @@ class BodyLogMsg(LogMsg):
         Добавляет информацию о результате сравнения полученного json с эталоном.
         """
         self._msg += f"{self.where} в json следующие поля не совпали с эталоном:\n"
-        for key, value1, value2 in diff:
-            if value1 == 'none':
-                value1 = ''
-            elif isinstance(value1, str):
-                value1 = f"'{value1}'"
-            if value2 == 'none':
-                value2 = ''
-            elif isinstance(value2, str):
-                value2 = f"'{value2}'"
-            if isinstance(value1, list) and isinstance(value2, list):
-                self._msg += f"{key}\n\texpected (count={len(value1)}) " \
-                             f":{value1}\n\tactual (count={len(value2)}):{value2}\n"
-            else:
-                self._msg += f"{key}\n\texpected:{value1}\n\tactual:{value2}\n"
+        for key, value in diff.items():
+            self._msg += f"ключ: {value['path']}\n\t\texpected: {value['expected']} \n\t\tactual: {value['actual']}\n"
         return self
 
     def add_expected_info(self, exp):
@@ -138,13 +125,13 @@ def assert_left_in_right_json(response, exp_json, actual_json):
     :param response: полученный ответ от сервера
     :param exp_json: ожидаемый эталонный json
     :param actual_json: полученый json
-    :raises AssertionError: если в exp_json есть поля, значение которых отличается от эталона
+    :raises AssertionError: если в exp_json есть поля со значениями, которые отличаются от эталонных
     """
-    compare_res = compare_json_left_in_right(exp_json, actual_json)
+    root = 'root:' if isinstance(actual_json, list) else ''
+    compare_res = compare_json_left_in_right(exp_json, actual_json, key=root, path=root)
     assert not compare_res, BodyLogMsg(response) \
         .add_request_url() \
         .add_compare_result(compare_res) \
-        .add_expected_info(exp_json) \
         .add_response_info() \
         .get_message()
 

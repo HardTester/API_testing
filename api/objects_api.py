@@ -6,6 +6,10 @@ def get_objects(client, *ids):
     return client.get(OBJECTS, params={'id': ids} if ids else None)
 
 
+def get_object(client, obj_id):
+    return client.get(OBJECTS_ITEM.format(obj_id))
+
+
 def post_object(client, obj):
     return client.post(OBJECTS, json=obj)
 
