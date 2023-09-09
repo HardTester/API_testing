@@ -1,0 +1,20 @@
+{
+  "post": {
+    "name": "string_name",
+    "data": {
+      "bool": true,
+      "int": 1000,
+      "float": 2.5,
+      "string": "string_field",
+      "array": [
+        "first",
+        "second",
+        "third"
+      ],
+      "obj": {
+        "name": "hello I'm object"
+      }
+    }
+  },
+  "put": {}
+}
