@@ -1,3 +1,9 @@
+def subdivision_dict(dict1, dict2):
+    for key, val in dict2.items():
+        if key not in dict1:
+            dict1[key] = val
+
+
 def remove_ids(origin_dict):
     """
     Удаляет ключи из словаря, в которых есть id

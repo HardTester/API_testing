@@ -18,3 +18,7 @@ def read_json_file_data(path):
     with open(f"{path}.json", "r") as f:
         data = json.load(f)
     return data
+
+
+def read_test_data(request):
+    return read_json_file_data(f"{get_test_data_path()}/{request.node.name}")

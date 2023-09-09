@@ -3,8 +3,9 @@ from http import HTTPStatus
 import pytest
 
 from api.api_client import ApiClient
-from api.objects_api import get_objects, get_object
-from assertions.assertion_base import assert_status_code, assert_left_in_right_json, assert_response_body
+from api.objects_api import get_objects, get_object, post_object
+from assertions.assertion_base import assert_status_code, assert_response_body
+from assertions.objects_assertion import should_be_valid_object
 
 
 class TestObjects:
@@ -27,3 +28,8 @@ class TestObjects:
         response = get_object(client, "ff8081818a394cb8018a790e1d534578")
         assert_status_code(response, HTTPStatus.NOT_FOUND)
         assert_response_body(request, response)
+
+    def test_post_object_empty_body(self, client, request):
+        response = post_object(client, obj={})
+        assert_status_code(response, HTTPStatus.OK)
+        should_be_valid_object(request, client, response)
