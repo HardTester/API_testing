@@ -17,10 +17,13 @@ class TestObjects:
         response = get_objects(client)
         assert_status_code(response, HTTPStatus.OK)
         assert_response_body(request, response)
-        pass
 
     def test_get_object(self, client, request):
         response = get_object(client, 7)
         assert_status_code(response, HTTPStatus.OK)
         assert_response_body(request, response)
-        pass
+
+    def test_get_object_not_exist(self, client, request):
+        response = get_object(client, "ff8081818a394cb8018a790e1d534578")
+        assert_status_code(response, HTTPStatus.NOT_FOUND)
+        assert_response_body(request, response)
