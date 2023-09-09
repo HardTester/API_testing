@@ -1,0 +1,17 @@
+{
+  "name": "string_name",
+  "data": {
+    "bool": true,
+    "int": 2019,
+    "float": 2049.99,
+    "string": "string_field",
+    "array": [
+      "first",
+      "second",
+      "third"
+    ],
+    "obj": {
+      "name": "hello I'm object"
+    }
+  }
+}

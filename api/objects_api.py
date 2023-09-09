@@ -14,8 +14,8 @@ def post_object(client, **kwargs):
     return client.post(OBJECTS, **kwargs)
 
 
-def put_object(client, obj_id, obj):
-    return client.put(OBJECTS_ITEM.format(obj_id), json=obj)
+def put_object(client, obj_id, **kwargs):
+    return client.put(OBJECTS_ITEM.format(obj_id), **kwargs)
 
 
 def delete_object(client, obj_id):
