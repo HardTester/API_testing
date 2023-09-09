@@ -6,7 +6,7 @@ from api.api_client import ApiClient
 from api.objects_api import get_objects, get_object, post_object
 from assertions.assertion_base import assert_status_code, assert_response_body
 from assertions.objects_assertion import should_be_valid_object
-from utilities.files_utils import read_test_data
+from utilities.files_utils import read_json_test_data
 
 
 class TestObjects:
@@ -31,21 +31,21 @@ class TestObjects:
         assert_response_body(request, response)
 
     def test_post_object_empty_body(self, client, request):
-        response = post_object(client, obj={})
+        response = post_object(client, json={})
 
         assert_status_code(response, HTTPStatus.OK)
-        should_be_valid_object(request, client, response)
-
-    def test_post_object_empty_body(self, client, request):
-        response = post_object(client, obj={})
-
-        assert_status_code(response, HTTPStatus.OK)
-        exp_obj = read_test_data(request)
+        exp_obj = read_json_test_data(request)
         should_be_valid_object(request, client, response, exp_obj)
 
     def test_post_object_with_full_body(self, client, request):
-        send_obj = read_test_data(request)
-        response = post_object(client, obj=send_obj)
+        send_obj = read_json_test_data(request)
+        response = post_object(client, json=send_obj)
 
         assert_status_code(response, HTTPStatus.OK)
         should_be_valid_object(request, client, response, send_obj)
+
+    def test_post_object_send_invalid_json(self, client, request):
+        response = post_object(client, content='{"name",}', headers={"Content-Type": "application/json"})
+
+        assert_status_code(response, HTTPStatus.BAD_REQUEST)
+        assert_response_body(request, response)
