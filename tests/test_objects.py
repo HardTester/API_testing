@@ -3,7 +3,7 @@ from http import HTTPStatus
 import pytest
 
 from api.api_client import ApiClient
-from api.objects_api import get_objects, get_object, post_object, put_object
+from api.objects_api import get_objects, get_object, post_object, put_object, delete_object
 from assertions.assertion_base import assert_status_code, assert_response_body, assert_bad_request, \
     assert_not_exist_response
 from assertions.objects_assertion import should_be_valid_post_object, should_be_valid_update_object
@@ -88,3 +88,11 @@ class TestObjects:
         response = put_object(client, obj_id, json={})
         assert_status_code(response, HTTPStatus.NOT_FOUND)
         assert_not_exist_response(request, response, obj_id)
+
+    def test_delete_exist_object(self, client, request):
+        response = post_object(client, json=read_json_test_data(request))
+        assert_status_code(response, HTTPStatus.OK)
+
+        obj_id = "ff8081818a194cb8018a79e7545545ac"
+        response = delete_object(client, obj_id)
+        assert_status_code(response, HTTPStatus.OK)
