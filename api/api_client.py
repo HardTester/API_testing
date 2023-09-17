@@ -6,8 +6,8 @@ from utilities.logger_utils import logger
 
 
 class ApiClient(Client):
-    def __init__(self, url=None, protocol='https'):
-        super().__init__(base_url=f"{protocol}://{url if url else os.getenv('RESOURSE_URL')}")
+    def __init__(self):
+        super().__init__(base_url=f"https://{os.getenv('RESOURSE_URL')}")
 
     def request(self, method, url, **kwargs) -> Response:
         """

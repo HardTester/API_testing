@@ -28,6 +28,12 @@ def should_be_update_success(request, client, response, exp_obj):
     assert exp_obj == response.json()
 
 
+def should_be_not_exist_get_item_obj(request, response, obj_id):
+    exp = read_json_test_data(request)
+    exp['error'] = exp['error'].format(obj_id)
+    assert_response_body(request, response, exp_obj=exp, rmv_ids=False)
+
+
 def should_be_delete_success(request, response, obj_id):
     exp = read_json_test_data(request)
     exp['message'] = exp['message'].format(obj_id)

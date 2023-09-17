@@ -111,12 +111,7 @@ def assert_schema(response, model: Type[BaseModel]):
     :param model: модель, по которой будет проверяться схема json
     :raises ValidationError: если json не соответствует схеме
     """
-    body = response.json()
-    if isinstance(body, list):
-        for item in body:
-            model.model_validate(item, strict=True)
-    else:
-        model.model_validate(body, strict=True)
+    model.model_validate(response.json(), strict=True)
 
 
 def assert_left_in_right_json(response, exp_json, actual_json):
