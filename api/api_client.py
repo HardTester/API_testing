@@ -6,6 +6,10 @@ from utilities.logger_utils import logger
 
 
 class ApiClient(Client):
+    """
+    Расширение стандартного клиента httpx.
+    """
+
     def __init__(self):
         super().__init__(base_url=f"https://{os.getenv('RESOURSE_URL')}")
 
