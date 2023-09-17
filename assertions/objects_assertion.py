@@ -5,6 +5,12 @@ from assertions.assertion_base import assert_response_body, assert_status_code
 from utilities.files_utils import read_json_test_data
 
 
+def should_be_valid_objects_response(request, response, param):
+    exp = read_json_test_data(request)[param['index']]
+    assert len(response.json()) == len(exp), "Длины не совпали"
+    assert_response_body(request, response, exp)
+
+
 def should_be_posted_success(request, client, response, exp_obj):
     assert_response_body(request, response, exp_obj)
 

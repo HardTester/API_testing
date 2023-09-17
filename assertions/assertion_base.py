@@ -2,7 +2,7 @@ from typing import Type
 
 from pydantic import BaseModel
 
-from utilities.files_utils import read_json_test_data, read_json_file_data, read_json_common_response_data
+from utilities.files_utils import read_json_test_data, read_json_common_response_data
 from utilities.json_utils import compare_json_left_in_right, remove_ids
 
 
@@ -140,6 +140,10 @@ def assert_response_body(request, response, exp_obj=None, rmv_ids=True):
     exp_json = read_json_test_data(request) if exp_obj is None else exp_obj
     act_json = remove_ids(response.json()) if rmv_ids else response.json()
     assert_left_in_right_json(response, exp_json, act_json)
+
+
+def assert_empty_list(response):
+    assert_left_in_right_json(response, [], response.json())
 
 
 def assert_bad_request(request, response):

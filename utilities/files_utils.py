@@ -28,21 +28,8 @@ def read_json_file_data(path):
     return data
 
 
-# def read_file_data(path):
-#     """
-#     возвращает содержимое файла
-#     """
-#     with open(f"{path}.json", "r") as f:
-#         data = f.read()
-#     return data
-
-
 def read_json_test_data(request):
-    return read_json_file_data(f"{get_test_data_path()}/{request.node.name}")
-
-
-# def read_test_data(request):
-#     return read_file_data(f"{get_test_data_path()}/{request.node.name}")
+    return read_json_file_data(f"{get_test_data_path()}/{request.node.originalname}")
 
 
 def read_json_common_response_data(file_name):

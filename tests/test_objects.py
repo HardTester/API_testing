@@ -5,9 +5,9 @@ import pytest
 from api.api_client import ApiClient
 from api.objects_api import get_objects, get_object, post_object, put_object, delete_object
 from assertions.assertion_base import assert_status_code, assert_response_body, assert_bad_request, \
-    assert_not_exist
+    assert_not_exist, assert_empty_list
 from assertions.objects_assertion import should_be_posted_success, should_be_update_success, should_be_delete_success, \
-    should_be_not_exist_delete_obj
+    should_be_not_exist_delete_obj, should_be_valid_objects_response
 from utilities.files_utils import read_json_test_data, read_json_common_request_data
 
 
@@ -21,6 +21,22 @@ class TestObjects:
         response = get_objects(client)
         assert_status_code(response, HTTPStatus.OK)
         assert_response_body(request, response)
+
+    @pytest.mark.parametrize("param", [{"index": 0, "ids": [1]}, {"index": 1, "ids": [1, 2]}])
+    def test_get_objects_id_param(self, client, request, param):
+        response = get_objects(client, *param['ids'])
+        assert_status_code(response, HTTPStatus.OK)
+        should_be_valid_objects_response(request, response, param)
+
+    def test_get_objects_not_exist_id(self, client):
+        response = get_objects(client, 8523697415)
+        assert_status_code(response, HTTPStatus.OK)
+        assert_empty_list(response)
+
+    def test_get_objects_invalid_id(self, client):
+        response = get_objects(client, "kjdsf23321")
+        assert_status_code(response, HTTPStatus.OK)
+        assert_empty_list(response)
 
     def test_get_object(self, client, request):
         response = get_object(client, 7)
