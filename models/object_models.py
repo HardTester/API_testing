@@ -1,39 +1,57 @@
-from datetime import datetime
+from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ObjectData(BaseModel):
     year: int
     price: float
-    CPU_model: str
-    Hard_disk_size: str
+    cpu_model: str = Field(alias="CPU model")
+    hard_disk_size: str = Field(alias="Hard disk size")
+
+
+class CustomObj(BaseModel):
+    name: str
+
+
+class CustomObjData(BaseModel):
+    bool: bool
+    int: int
+    float: float
+    string: str
+    array: List[str]
+    obj: CustomObj
 
 
 class ObjectOutSchema(BaseModel):
-    id: int
-    name: str
-    data: ObjectData
-
-
-class ObjectInSchema(BaseModel):
+    id: str
     name: str
     data: ObjectData
 
 
 class ObjectCreateOutSchema(BaseModel):
-    id: int
+    id: str
+    name: str | None
+    data: ObjectData | None
+    createdAt: str
+
+
+class CustomObjCreateOutSchema(BaseModel):
+    id: str
     name: str
-    data: ObjectData
-    createdAt: datetime
+    data: CustomObjData
+    createdAt: str
 
 
 class ObjectUpdateOutSchema(BaseModel):
-    id: int
+    id: str
+    name: str | None
+    data: ObjectData | None
+    updatedAt: str
+
+
+class CustomObjUpdateOutSchema(BaseModel):
+    id: str
     name: str
-    data: ObjectData
-    updatedAt: datetime
-
-
-class ObjectDeleteOutSchema(BaseModel):
-    message: str
+    data: CustomObjData
+    updatedAt: str

@@ -5,9 +5,11 @@ import pytest
 from api.api_client import ApiClient
 from api.objects_api import get_objects, get_object, post_object, put_object, delete_object
 from assertions.assertion_base import assert_status_code, assert_response_body, assert_bad_request, \
-    assert_not_exist, assert_empty_list
+    assert_not_exist, assert_empty_list, assert_schema
 from assertions.objects_assertion import should_be_posted_success, should_be_update_success, should_be_delete_success, \
     should_be_not_exist_delete_obj, should_be_valid_objects_response
+from models.object_models import ObjectOutSchema, ObjectCreateOutSchema, CustomObjCreateOutSchema, \
+    ObjectUpdateOutSchema, CustomObjUpdateOutSchema
 from utilities.files_utils import read_json_test_data, read_json_common_request_data
 
 
@@ -41,6 +43,7 @@ class TestObjects:
     def test_get_object(self, client, request):
         response = get_object(client, 7)
         assert_status_code(response, HTTPStatus.OK)
+        assert_schema(response, ObjectOutSchema)
         assert_response_body(request, response)
 
     def test_get_object_not_exist(self, client, request):
@@ -52,6 +55,7 @@ class TestObjects:
         response = post_object(client, json={})
 
         assert_status_code(response, HTTPStatus.OK)
+        assert_schema(response, ObjectCreateOutSchema)
         exp_obj = {"data": None, "name": None}
         should_be_posted_success(request, client, response, exp_obj)
 
@@ -60,6 +64,7 @@ class TestObjects:
         response = post_object(client, json=exp_obj)
 
         assert_status_code(response, HTTPStatus.OK)
+        assert_schema(response, CustomObjCreateOutSchema)
         should_be_posted_success(request, client, response, exp_obj)
 
     def test_post_object_send_invalid_json(self, client, request):
@@ -76,6 +81,7 @@ class TestObjects:
         exp_json = {"id": response.json()['id'], "name": None, "data": None}
         response = put_object(client, exp_json['id'], json={})
         assert_status_code(response, HTTPStatus.OK)
+        assert_schema(response, ObjectUpdateOutSchema)
         should_be_update_success(request, client, response, exp_json)
 
     def test_put_object_with_full_body(self, client, request):
@@ -87,6 +93,7 @@ class TestObjects:
         put_obj_id = response.json()['id']
         response = put_object(client, put_obj_id, json=put_obj)
         assert_status_code(response, HTTPStatus.OK)
+        assert_schema(response, CustomObjUpdateOutSchema)
 
         put_obj['id'] = put_obj_id
         should_be_update_success(request, client, response, put_obj)
