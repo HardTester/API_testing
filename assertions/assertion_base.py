@@ -13,30 +13,32 @@ class LogMsg:
 
     def __init__(self, where, response):
         self._msg = ""
-        self.response = response
-        self.where = where
-        return self
+        self._response = response
+        self._where = where
 
     def add_request_url(self):
         """
-        Добавляет данные об отправленном на сервер запросе.
+        добавляет данные об отправленном на сервер запросе
         """
         self._msg += f"Содержимое отправляемого запроса (url, query params, тело):\n" \
-                     f"\tURL: {self.response.request.url}\n"
-        self._msg += f"\tmethod: {self.response.request.method}\n"
-        self._msg += f"\theaders: {dict(self.response.request.headers)}\n"
-        if hasattr(self.response.request, 'params') and self.response.request.params:
-            self._msg += f"\tquery params: {self.response.request.params}\n"
+                     f"\tURL: {self._response.request.url}\n"
+        self._msg += f"\tmethod: {self._response.request.method}\n"
+        self._msg += f"\theaders: {dict(self._response.request.headers)}\n"
+        if hasattr(self._response.request, 'params') and self._response.request.params:
+            self._msg += f"\tquery params: {self._response.request.params}\n"
         else:
             self._msg += f"\tquery params:\n"
-        if hasattr(self.response.request, 'content') and self.response.request.read():
-            self._msg += f"\tbody: {self.response.request.read()}\n"
+        if hasattr(self._response.request, 'content') and self._response.request.read():
+            self._msg += f"\tbody: {self._response.request.read()}\n"
         else:
             self._msg += f"\tbody:\n"
         return self
 
     def add_response_info(self):
-        self._msg += f"Тело ответа:\n\t{self.response.content}\n"
+        """
+        добавляет информацию о содержимом тела ответа
+        """
+        self._msg += f"Тело ответа:\n\t{self._response.content}\n"
         return self
 
     def get_message(self):
@@ -45,7 +47,7 @@ class LogMsg:
 
 class BodyLogMsg(LogMsg):
     """
-    Добавляет в логи результаты проверок тела ответа
+    Добавляет в логи результаты проверок тела ответа.
     """
 
     def __init__(self, response):
@@ -53,74 +55,64 @@ class BodyLogMsg(LogMsg):
 
     def add_compare_result(self, diff):
         """
-        Добавляет информацию о результате сравнения полученного json с эталоном.
+        добавляет информацию о результате сравнения полученного json с эталоном
+        :param diff: словарь с данными полей, которые после сравнения имеют разные значения
         """
-        self._msg += f"{self.where} в json следующие поля не совпали с эталоном:\n"
+        self._msg += f"{self._where} в json следующие поля не совпали с эталоном:\n"
         for key, value in diff.items():
             self._msg += f"ключ: {value['path']}\n\t\texpected: {value['expected']} \n\t\tactual: {value['actual']}\n"
-        return self
-
-    def add_expected_info(self, exp):
-        self._msg += f"Проверяемые поля ответа:\n\t{exp}\n"
-        return self
-
-    def add_compare_values(self, exp, act):
-        """
-        Добавляет информацию о результате сравнения тела ответа с эталоном,
-        когда в теле ответа только единичное значение (без json).
-        """
-        exp = f"'{exp}'" if isinstance(exp, str) else exp
-        act = f"'{act}'" if isinstance(act, str) else act
-        self._msg += f"{self.where} ожидаемое значение не совпало с фактическим\n" \
-                     f"\texpected: {exp}\n" \
-                     f"\tactual: {act}\n"
         return self
 
 
 class CodeLogMsg(LogMsg):
     """
-    Добавляет в логи результаты проверки кода ответа
+    Добавляет в логи результаты проверки кода ответа.
     """
 
     def __init__(self, response):
         super().__init__('В КОДЕ ОТВЕТА', response)
 
     def add_compare_result(self, exp, act):
-        self._msg += f"{self.where} \n\tожидался код: {exp}\n\tполученный код: {act}\n"
+        """
+        добавляет информацию об ожидаемом и полученной коде
+        :param exp: ожидаемый код
+        :param act: полученный код
+        """
+        self._msg += f"{self._where} \n\tожидался код: {exp}\n\tполученный код: {act}\n"
         return self
 
 
-def assert_status_code(response, expected):
+def assert_status_code(response, expected_code):
     """
-    Сравнивает код ответа с ожидаемым.
+    сравнивает код ответа от сервера с ожидаемым
     :param response: полученный от сервера ответ
-    :param expected: ожидаемый код ответа.
+    :param expected_code: ожидаемый код ответа
     :raises AssertionError: если значения не совпали
     """
-    assert expected == response.status_code, CodeLogMsg(response) \
+    assert expected_code == response.status_code, CodeLogMsg(response) \
         .add_request_url() \
-        .add_compare_result(expected, response.status_code) \
+        .add_compare_result(expected_code, response.status_code) \
         .add_response_info() \
         .get_message()
 
 
 def assert_schema(response, model: Type[BaseModel]):
     """
-    Проверяет json на соответствие его схеме механизмами pydantic.
+    проверяет тело ответа на соответствие его схеме механизмами pydantic
     :param response: ответ от сервера
     :param model: модель, по которой будет проверяться схема json
-    :raises ValidationError: если json не соответствует схеме
+    :raises ValidationError: если тело ответа не соответствует схеме
     """
     model.model_validate(response.json(), strict=True)
 
 
 def assert_left_in_right_json(response, exp_json, actual_json):
     """
-    Убеждается, что все значения полей exp_json равны значениям полей в actual_json.
+    проверяет, что все значения полей exp_json равны значениям полей в actual_json
     :param response: полученный ответ от сервера
     :param exp_json: ожидаемый эталонный json
     :param actual_json: полученый json
-    :raises AssertionError: если в exp_json есть поля со значениями, которые отличаются от эталонных
+    :raises AssertionError: если в exp_json есть поля со значениями, которые отличаются или которых нет в actual_json
     """
     root = 'root:' if isinstance(actual_json, list) else ''
     compare_res = compare_json_left_in_right(exp_json, actual_json, key=root, path=root)
@@ -132,20 +124,42 @@ def assert_left_in_right_json(response, exp_json, actual_json):
 
 
 def assert_response_body(request, response, exp_obj=None, rmv_ids=True):
+    """
+    проверяет ответ от сервера, сравнивая ожидаемый объект с полученным
+    :param request: стандартный объект request фреймворка pytest
+    :param response: ответ от сервера
+    :param exp_obj: ожидаемый объект
+    :param rmv_ids: флаг: значение True - удаляет id из тела ответа при проверке, False - не удаляет
+    """
     exp_json = read_json_test_data(request) if exp_obj is None else exp_obj
     act_json = remove_ids(response.json()) if rmv_ids else response.json()
     assert_left_in_right_json(response, exp_json, act_json)
 
 
 def assert_empty_list(response):
+    """
+    проверяет, что тело ответа содержит пустой список
+    :param response: ответ от сервера
+    """
     assert_left_in_right_json(response, [], response.json())
 
 
 def assert_bad_request(request, response):
+    """
+    проверяет, что тело ответа содержит данные BAD REQUEST
+    :param request: стандартный объект request фреймворка pytest
+    :param response: ответ от сервера
+    """
     assert_response_body(request, response, exp_obj=read_json_common_response_data("bad_request_response"))
 
 
 def assert_not_exist(request, response, obj_id):
+    """
+    проверяет, что тело ответа содержит данные NOT FOUND
+    :param request: стандартный объект request фреймворка pytest
+    :param response: ответ от сервера
+    :param obj_id: id объекта, который сервер не нашел
+    """
     exp = read_json_common_response_data("not_exist_obj_response")
     exp['error'] = exp['error'].format(obj_id)
     assert_response_body(request, response, exp_obj=exp)

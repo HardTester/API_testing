@@ -6,14 +6,19 @@ from utilities.files_utils import read_json_test_data
 
 
 def should_be_valid_objects_response(request, response, param):
+    # убеждаемся, что в ответе столько объектов, сколько мы ожидаем
     exp = read_json_test_data(request)[param['index']]
     assert len(response.json()) == len(exp), "Длины не совпали"
+
+    # убеждаемся в корректности полученных объектов
     assert_response_body(request, response, exp)
 
 
 def should_be_posted_success(request, client, response, exp_obj):
+    # убеждаемся в корректности полученного тела ответа
     assert_response_body(request, response, exp_obj)
 
+    # убеждаемся, что объект корректно сохранен на сервере
     exp_obj['id'] = response.json()['id']
     response = get_object(client, exp_obj['id'])
     assert_status_code(response, HTTPStatus.OK)
@@ -21,8 +26,10 @@ def should_be_posted_success(request, client, response, exp_obj):
 
 
 def should_be_update_success(request, client, response, exp_obj):
+    # убеждаемся в корректности полученного тела ответа
     assert_response_body(request, response, exp_obj, rmv_ids=False)
 
+    # убеждаемся, что объект корректно обновлен на сервере
     response = get_object(client, exp_obj['id'])
     assert_status_code(response, HTTPStatus.OK)
     assert exp_obj == response.json()
