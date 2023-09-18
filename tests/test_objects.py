@@ -5,9 +5,9 @@ import pytest
 from api.api_client import ApiClient
 from api.objects_api import get_objects, get_object, post_object, put_object, delete_object
 from assertions.assertion_base import assert_status_code, assert_response_body_fields, assert_bad_request, \
-    assert_not_exist, assert_empty_list, assert_schema
+    assert_not_found, assert_empty_list, assert_schema, assert_not_exist
 from assertions.objects_assertion import should_be_posted_success, should_be_updated_success, should_be_deleted_success, \
-    should_be_valid_objects_response, should_be_not_exist_obj_error
+    should_be_valid_objects_response
 from models.object_models import ObjectOutSchema, ObjectCreateOutSchema, CustomObjCreateOutSchema, \
     ObjectUpdateOutSchema, CustomObjUpdateOutSchema
 from utilities.files_utils import read_json_test_data, read_json_common_request_data
@@ -94,7 +94,7 @@ class TestObjects:
 
         # убеждаемся, что сервер вернул NOT FOUND ответ
         assert_status_code(response, HTTPStatus.NOT_FOUND)
-        should_be_not_exist_obj_error(request, response, 1593576458)
+        assert_not_exist(request, response, 1593576458)
 
     def test_post_object_empty_body(self, client, request):
         """
@@ -203,7 +203,7 @@ class TestObjects:
 
         # убеждаемся, что сервер дал NOT FOUND ответ
         assert_status_code(response, HTTPStatus.NOT_FOUND)
-        assert_not_exist(request, response, obj_id)
+        assert_not_found(request, response, obj_id)
 
     def test_delete_exist_object(self, client, request):
         """
@@ -233,4 +233,4 @@ class TestObjects:
 
         # убеждаемся, что сервер дал NOT FOUND ответ
         assert_status_code(response, HTTPStatus.NOT_FOUND)
-        should_be_not_exist_obj_error(request, response, obj_id)
+        assert_not_exist(request, response, obj_id)

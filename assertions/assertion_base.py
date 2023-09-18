@@ -190,13 +190,25 @@ def assert_bad_request(request, response):
     assert_response_body_fields(request, response, exp_obj=read_json_common_response_data("bad_request_response"))
 
 
-def assert_not_exist(request, response, obj_id):
+def assert_not_found(request, response, obj_id):
     """
     проверяет, что тело ответа содержит данные NOT FOUND
     :param request: стандартный объект request фреймворка pytest
     :param response: ответ от сервера
     :param obj_id: id объекта, который сервер не нашел
     """
-    exp = read_json_common_response_data("not_exist_obj_response")
+    exp = read_json_common_response_data("not_found_obj_response")
     exp['error'] = exp['error'].format(obj_id)
     assert_response_body_fields(request, response, exp_obj=exp)
+
+
+def assert_not_exist(request, response, obj_id):
+    """
+    проверяет, что тело ответа содержит данные NOT EXIST
+    :param request: стандартный объект request фреймворка pytest
+    :param response: ответ от сервера
+    :param obj_id: id объекта, который сервер не нашел
+    """
+    exp = read_json_test_data(request)
+    exp['error'] = exp['error'].format(obj_id)
+    assert_response_body_fields(request, response, exp_obj=exp, rmv_ids=False)
