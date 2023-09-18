@@ -41,6 +41,13 @@ class LogMsg:
         self._msg += f"Тело ответа:\n\t{self._response.content}\n"
         return self
 
+    def add_error_info(self, text):
+        if text:
+            self._msg += f"\n{text}\n"
+        else:
+            self._msg += "\n"
+        return self
+
     def get_message(self):
         return self._msg
 
@@ -82,6 +89,20 @@ class CodeLogMsg(LogMsg):
         return self
 
 
+class BodyValueLogMsg(LogMsg):
+    def __init__(self, response):
+        super().__init__('В ТЕЛЕ ОТВЕТА', response)
+
+    def add_compare_result(self, exp, act):
+        """
+        добавляет информацию о сравнении значений в теле ответа
+        :param exp: ожидаемое значение
+        :param act: полученное значение
+        """
+        self._msg += f"\texptected: {exp}\n\tactual: {act}\n"
+        return self
+
+
 def assert_status_code(response, expected_code):
     """
     сравнивает код ответа от сервера с ожидаемым
@@ -90,8 +111,8 @@ def assert_status_code(response, expected_code):
     :raises AssertionError: если значения не совпали
     """
     assert expected_code == response.status_code, CodeLogMsg(response) \
-        .add_request_url() \
         .add_compare_result(expected_code, response.status_code) \
+        .add_request_url() \
         .add_response_info() \
         .get_message()
 
@@ -117,13 +138,13 @@ def assert_left_in_right_json(response, exp_json, actual_json):
     root = 'root:' if isinstance(actual_json, list) else ''
     compare_res = compare_json_left_in_right(exp_json, actual_json, key=root, path=root)
     assert not compare_res, BodyLogMsg(response) \
-        .add_request_url() \
         .add_compare_result(compare_res) \
+        .add_request_url() \
         .add_response_info() \
         .get_message()
 
 
-def assert_response_body(request, response, exp_obj=None, rmv_ids=True):
+def assert_response_body_fields(request, response, exp_obj=None, rmv_ids=True):
     """
     проверяет ответ от сервера, сравнивая ожидаемый объект с полученным
     :param request: стандартный объект request фреймворка pytest
@@ -134,6 +155,22 @@ def assert_response_body(request, response, exp_obj=None, rmv_ids=True):
     exp_json = read_json_test_data(request) if exp_obj is None else exp_obj
     act_json = remove_ids(response.json()) if rmv_ids else response.json()
     assert_left_in_right_json(response, exp_json, act_json)
+
+
+def assert_response_body_value(response, exp, act, text=None):
+    """
+    проверяет ответ от сервера, сравнивая полученное значение с ожидаемым для тела запроса
+    :param response: ответ от сервера
+    :param exp: ожидаемое значение
+    :param act: полученное значение
+    :param text: дополнительный текст, который необходимо вывести при несовпадении exp и act
+    """
+    assert exp == act, BodyValueLogMsg(response) \
+        .add_error_info(text) \
+        .add_compare_result(exp, act) \
+        .add_request_url() \
+        .add_response_info() \
+        .get_message()
 
 
 def assert_empty_list(response):
@@ -150,7 +187,7 @@ def assert_bad_request(request, response):
     :param request: стандартный объект request фреймворка pytest
     :param response: ответ от сервера
     """
-    assert_response_body(request, response, exp_obj=read_json_common_response_data("bad_request_response"))
+    assert_response_body_fields(request, response, exp_obj=read_json_common_response_data("bad_request_response"))
 
 
 def assert_not_exist(request, response, obj_id):
@@ -162,4 +199,4 @@ def assert_not_exist(request, response, obj_id):
     """
     exp = read_json_common_response_data("not_exist_obj_response")
     exp['error'] = exp['error'].format(obj_id)
-    assert_response_body(request, response, exp_obj=exp)
+    assert_response_body_fields(request, response, exp_obj=exp)

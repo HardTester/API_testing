@@ -4,7 +4,7 @@ import pytest
 
 from api.api_client import ApiClient
 from api.objects_api import get_objects, get_object, post_object, put_object, delete_object
-from assertions.assertion_base import assert_status_code, assert_response_body, assert_bad_request, \
+from assertions.assertion_base import assert_status_code, assert_response_body_fields, assert_bad_request, \
     assert_not_exist, assert_empty_list, assert_schema
 from assertions.objects_assertion import should_be_posted_success, should_be_update_success, should_be_delete_success, \
     should_be_not_exist_delete_obj, should_be_valid_objects_response, should_be_not_exist_get_item_obj
@@ -32,7 +32,7 @@ class TestObjects:
 
         # убеждаемся, что в ответ пришли объекты, которые мы ожидаем
         assert_status_code(response, HTTPStatus.OK)
-        assert_response_body(request, response)
+        assert_response_body_fields(request, response)
 
     @pytest.mark.parametrize("param", [{"index": 0, "ids": [1]}, {"index": 1, "ids": [1, 2]}])
     def test_get_objects_id_param(self, client, request, param):
@@ -82,7 +82,7 @@ class TestObjects:
         # убеждаемся, что получен именно тот объект, который мы запросили
         assert_status_code(response, HTTPStatus.OK)
         assert_schema(response, ObjectOutSchema)
-        assert_response_body(request, response)
+        assert_response_body_fields(request, response)
 
     def test_get_object_not_exist(self, client, request):
         """
