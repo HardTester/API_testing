@@ -27,7 +27,7 @@ def should_be_posted_success(request, client, response, exp_obj):
     assert exp_obj == response.json()
 
 
-def should_be_update_success(request, client, response, exp_obj):
+def should_be_updated_success(request, client, response, exp_obj):
     # убеждаемся в корректности значений полей тела ответа
     assert_response_body_fields(request, response, exp_obj, rmv_ids=False)
 
@@ -37,19 +37,13 @@ def should_be_update_success(request, client, response, exp_obj):
     assert exp_obj == response.json()
 
 
-def should_be_not_exist_get_item_obj(request, response, obj_id):
+def should_be_not_exist_obj_error(request, response, obj_id):
     exp = read_json_test_data(request)
     exp['error'] = exp['error'].format(obj_id)
     assert_response_body_fields(request, response, exp_obj=exp, rmv_ids=False)
 
 
-def should_be_delete_success(request, response, obj_id):
+def should_be_deleted_success(request, response, obj_id):
     exp = read_json_test_data(request)
     exp['message'] = exp['message'].format(obj_id)
-    assert_response_body_fields(request, response, exp_obj=exp, rmv_ids=False)
-
-
-def should_be_not_exist_delete_obj(request, response, obj_id):
-    exp = read_json_test_data(request)
-    exp['error'] = exp['error'].format(obj_id)
     assert_response_body_fields(request, response, exp_obj=exp, rmv_ids=False)

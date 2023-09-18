@@ -6,8 +6,8 @@ from api.api_client import ApiClient
 from api.objects_api import get_objects, get_object, post_object, put_object, delete_object
 from assertions.assertion_base import assert_status_code, assert_response_body_fields, assert_bad_request, \
     assert_not_exist, assert_empty_list, assert_schema
-from assertions.objects_assertion import should_be_posted_success, should_be_update_success, should_be_delete_success, \
-    should_be_not_exist_delete_obj, should_be_valid_objects_response, should_be_not_exist_get_item_obj
+from assertions.objects_assertion import should_be_posted_success, should_be_updated_success, should_be_deleted_success, \
+    should_be_valid_objects_response, should_be_not_exist_obj_error
 from models.object_models import ObjectOutSchema, ObjectCreateOutSchema, CustomObjCreateOutSchema, \
     ObjectUpdateOutSchema, CustomObjUpdateOutSchema
 from utilities.files_utils import read_json_test_data, read_json_common_request_data
@@ -94,7 +94,7 @@ class TestObjects:
 
         # убеждаемся, что сервер вернул NOT FOUND ответ
         assert_status_code(response, HTTPStatus.NOT_FOUND)
-        should_be_not_exist_get_item_obj(request, response, 1593576458)
+        should_be_not_exist_obj_error(request, response, 1593576458)
 
     def test_post_object_empty_body(self, client, request):
         """
@@ -152,7 +152,7 @@ class TestObjects:
         # убеждаемся, что объект был успешно обновлен
         assert_status_code(response, HTTPStatus.OK)
         assert_schema(response, ObjectUpdateOutSchema)
-        should_be_update_success(request, client, response, exp_json)
+        should_be_updated_success(request, client, response, exp_json)
 
     def test_put_object_with_full_body(self, client, request):
         """
@@ -173,7 +173,7 @@ class TestObjects:
         assert_status_code(response, HTTPStatus.OK)
         assert_schema(response, CustomObjUpdateOutSchema)
         put_obj['id'] = put_obj_id
-        should_be_update_success(request, client, response, put_obj)
+        should_be_updated_success(request, client, response, put_obj)
 
     def test_put_object_send_invalid_json(self, client, request):
         """
@@ -220,7 +220,7 @@ class TestObjects:
 
         # убеждаемся, что объект удален
         assert_status_code(response, HTTPStatus.OK)
-        should_be_delete_success(request, response, obj_id)
+        should_be_deleted_success(request, response, obj_id)
 
     def test_delete_not_exist_object(self, client, request):
         """
@@ -233,4 +233,4 @@ class TestObjects:
 
         # убеждаемся, что сервер дал NOT FOUND ответ
         assert_status_code(response, HTTPStatus.NOT_FOUND)
-        should_be_not_exist_delete_obj(request, response, obj_id)
+        should_be_not_exist_obj_error(request, response, obj_id)
