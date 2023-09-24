@@ -1,22 +1,16 @@
 import json
-import os
-
-
-def get_project_path():
-    separated = os.getcwd().rpartition('API_testing')
-    return separated[0] + separated[1]
 
 
 def get_test_data_path():
-    return get_project_path() + "/test_data"
+    return "test_data"
 
 
 def get_common_response_path():
-    return get_test_data_path() + "/common/responses"
+    return f"{get_test_data_path()}/common/responses"
 
 
 def get_common_requests_path():
-    return get_test_data_path() + "/common/requests"
+    return f"{get_test_data_path()}/common/requests"
 
 
 def read_json_file_data(path):

@@ -1,17 +1,20 @@
 import logging
+import os
 
 from dotenv import load_dotenv
 
-from utilities.files_utils import get_project_path
 from utilities.logger_utils import logger
 
 
 def pytest_configure(config):
+    # устанавливаем текущую директорию на корень проекта (это позволит прописывать относительные пути к файлам)
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
     # загружаем переменные-параметры из файла /.env
-    load_dotenv(dotenv_path=get_project_path() + '/.env')
+    load_dotenv(dotenv_path=".env")
 
     # задаем паарметры логгера
-    file_handler = logging.FileHandler(f"{get_project_path()}/logs/info.log", "w")
+    file_handler = logging.FileHandler(f"logs/info.log", "w")
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(logging.Formatter("%(lineno)d: %(asctime)s %(message)s"))
 
