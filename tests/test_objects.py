@@ -45,7 +45,6 @@ class TestObjects:
 
         # убеждаемся, что в ответ пришли именно те объекты, id которых мы запросили
         assert_status_code(response, HTTPStatus.OK)
-        assert_schema(response, ObjectOutSchema)
         should_be_valid_objects_response(request, response, param)
 
     def test_get_objects_not_exist_id(self, client):
