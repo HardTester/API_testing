@@ -13,7 +13,7 @@ def pytest_configure(config):
     # загружаем переменные-параметры из файла /.env
     load_dotenv(dotenv_path=".env")
 
-    # задаем паарметры логгера
+    # задаем параметры логгера
     path = "logs/"
     os.makedirs(os.path.dirname(path), exist_ok=True)
     file_handler = logging.FileHandler(path + "/info.log", "w")
