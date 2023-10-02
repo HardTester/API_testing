@@ -14,7 +14,9 @@ def pytest_configure(config):
     load_dotenv(dotenv_path=".env")
 
     # задаем паарметры логгера
-    file_handler = logging.FileHandler(f"logs/info.log", "w")
+    path = "logs/"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    file_handler = logging.FileHandler(path + "/info.log", "w")
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(logging.Formatter("%(lineno)d: %(asctime)s %(message)s"))
 
